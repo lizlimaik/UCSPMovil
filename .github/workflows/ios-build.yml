@@ -42,19 +42,12 @@ jobs:
           pod install --repo-update
 
       # 6. Build iOS with Xcode
-      - name: Build iOS App
+      - name: Build for Simulator (no signing)
         run: |
           cd ios
           xcodebuild \
             -workspace UCSPMovil.xcworkspace \
             -scheme UCSPMovil \
-            -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath build
-
-      # 7. Export artifacts
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build
-          path: ios/build
+            -sdk iphonesimulator \
+            -configuration Debug \
+            build | xcpretty

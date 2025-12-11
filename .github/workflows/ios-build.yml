@@ -1,0 +1,60 @@
+name: iOS Build (React Native 0.75.4)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build iOS App
+    runs-on: macos-15   # Incluye Xcode 16.3
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      # 3. Install dependencies
+      - name: Install Node dependencies
+        run: npm install
+
+      # 4. Install Ruby (para CocoaPods)
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: false
+
+      # 5. Install CocoaPods
+      - name: Install CocoaPods
+        run: |
+          sudo gem install cocoapods -v 1.15.2
+          cd ios
+          pod install --repo-update
+
+      # 6. Build iOS with Xcode
+      - name: Build iOS App
+        run: |
+          cd ios
+          xcodebuild \
+            -workspace UCSPMovil.xcworkspace \
+            -scheme UCSPMovil \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build
+
+      # 7. Export artifacts
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: ios/build

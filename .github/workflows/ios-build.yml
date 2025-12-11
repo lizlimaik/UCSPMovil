@@ -41,6 +41,9 @@ jobs:
           cd ios
           pod install --repo-update
 
+      - name: Install xcpretty
+        run: sudo gem install xcpretty
+        
       # 6. Build iOS with Xcode
       - name: Build for Simulator (no signing)
         run: |
